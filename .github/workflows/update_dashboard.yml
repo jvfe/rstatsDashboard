@@ -8,7 +8,6 @@ on:
     - cron: "30 01 * * 6"
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-  push:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -31,11 +30,11 @@ jobs:
           Rscript -e "install.packages(c('dplyr','flexdashboard','rtweet', 'httr', 'lubridate', 'echarts4r', 'stringr'))"
       - name: Update dashboard
         run: |
-          Rscript -e "rmarkdown::render('./dashboard.Rmd')"
+          Rscript -e "rmarkdown::render('./index.Rmd')"
       - name: Update repository
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add ./dashboard.html
+          git add ./index.html
           git commit -m "chore: Update dashboard" || echo "Failed on commit"
           git push || echo "Failed on push"

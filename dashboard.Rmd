@@ -16,49 +16,45 @@ library(httr)
 library(lubridate)
 library(echarts4r)
 
+get_unique_value <- function(data, col) {
+  col <- enquo(col)
+  data %>%
+    pull(!!col) %>%
+    unique() %>%
+    length()
+}
+
 rstats_tweets <- read_twitter_csv("data/rstats_tweets.csv")
 
-count_timeseries <- rstats_tweets %>% 
+count_timeseries <- rstats_tweets %>%
   ts_data(by = "hours")
 
-tweets_today <- rstats_tweets %>% 
+tweets_today <- rstats_tweets %>%
   filter(created_at == today())
 
-by_hour <- rstats_tweets %>% 
-  group_by(hour = hour(created_at)) %>% 
-  summarise(count = n()) %>% 
+by_hour <- rstats_tweets %>%
+  group_by(hour = hour(created_at)) %>%
+  summarise(count = n()) %>%
   ungroup()
 
-number_of_unique_tweets <- rstats_tweets %>% 
-  pull(text) %>% 
-  unique() %>% 
-  length()
+number_of_unique_tweets <- get_unique_value(rstats_tweets, text)
 
-number_of_unique_tweets_today <- tweets_today %>%
-  pull(text) %>% 
-  unique() %>% 
-  length()
+number_of_unique_tweets_today <- get_unique_value(tweets_today, text)
 
-number_of_tweeters_today <- tweets_today %>% 
-  pull(user_id) %>% 
-  unique() %>% 
-  length()
+number_of_tweeters_today <- get_unique_value(tweets_today, user_id)
 
-number_of_likes <- rstats_tweets %>% 
-  pull(favorite_count) %>% 
+number_of_likes <- rstats_tweets %>%
+  pull(favorite_count) %>%
   sum()
 
 get_tweet_embed <- function(user, status_id) {
-  
   url <- stringr::str_glue("https://publish.twitter.com/oembed?url=https://twitter.com/{user}/status/{status_id}&partner=&hide_thread=false")
-  
-  response <- GET(url) %>% 
-    content()
-  
-  return(response$html)
-  
-}
 
+  response <- GET(url) %>%
+    content()
+
+  return(response$html)
+}
 ```
 
 
@@ -95,23 +91,23 @@ Row {.tabset .tabset-fade data-width=400}
 ### Tweet volume
 
 ```{r}
-count_timeseries %>% 
-  e_charts(time) %>% 
-  e_line(n, name = "# of tweets", smooth = TRUE) %>% 
+count_timeseries %>%
+  e_charts(time) %>%
+  e_line(n, name = "# of tweets", smooth = TRUE) %>%
   e_x_axis(
-    type = "time", 
-    formatter =  htmlwidgets::JS(
-      'function(value){
+    type = "time",
+    formatter = htmlwidgets::JS(
+      "function(value){
         let date = new Date(value);
         
         label = `${date.getDate()}-${(parseInt(date.getMonth()) + 1)}-${date.getFullYear()}`;
         return label;
-      }'
+      }"
     )
-  ) %>% 
-  e_axis_labels(y="Tweets") %>% 
-  e_theme("westeros") %>% 
-  e_tooltip(trigger="axis", formatter = htmlwidgets::JS("
+  ) %>%
+  e_axis_labels(y = "Tweets") %>%
+  e_theme("westeros") %>%
+  e_tooltip(trigger = "axis", formatter = htmlwidgets::JS("
     function(params) {
       let date = new Date(params[0].value[0])
       let options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric'}
@@ -124,15 +120,15 @@ count_timeseries %>%
 ### Tweets by Hour of Day
 
 ```{r}
-by_hour %>% 
-  e_charts(hour) %>% 
-  e_step(count, name = "Tweets", step="middle") %>% 
+by_hour %>%
+  e_charts(hour) %>%
+  e_step(count, name = "Tweets", step = "middle") %>%
   e_x_axis(
     min = 0,
     max = 23,
-  ) %>% 
-  e_axis_labels(x = "Time of Day (UTC)", y="Tweets") %>% 
-  e_theme("westeros") %>% 
+  ) %>%
+  e_axis_labels(x = "Time of Day (UTC)", y = "Tweets") %>%
+  e_theme("westeros") %>%
   e_tooltip(trigger = "axis", formatter = htmlwidgets::JS("
     function(params) {
       let title = `<strong>${params[0].value[0]}h</strong>`
@@ -148,7 +144,7 @@ Row
 ### 💗 Most Liked Tweet Today {.tweet-title}
 
 ```{r}
-most_liked_url <- tweets_today %>% 
+most_liked_url <- tweets_today %>%
   slice_max(favorite_count)
 
 shiny::HTML(get_tweet_embed(most_liked_url$screen_name, most_liked_url$status_id))
@@ -157,7 +153,7 @@ shiny::HTML(get_tweet_embed(most_liked_url$screen_name, most_liked_url$status_id
 ### ✨ Most Retweeted Tweet Today
 
 ```{r}
-most_retweeted <- tweets_today %>% 
+most_retweeted <- tweets_today %>%
   slice_max(retweet_count)
 
 shiny::HTML(get_tweet_embed(most_retweeted$screen_name, most_retweeted$status_id))
@@ -166,7 +162,7 @@ shiny::HTML(get_tweet_embed(most_retweeted$screen_name, most_retweeted$status_id
 ### 🎉 Most Recent
 
 ```{r}
-most_recent <- tweets_today %>% 
+most_recent <- tweets_today %>%
   slice_max(created_at)
 
 shiny::HTML(get_tweet_embed(most_recent$screen_name, most_recent$status_id))

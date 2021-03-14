@@ -4,7 +4,7 @@ library(rtweet)
 
 secrets <- Sys.getenv(c("TWITTER_KEY", "TWITTER_SECRET", "ACCESS_TOKEN", "ACCESS_SECRET"))
 current_date <- date(Sys.Date())
-current_tweet_data <- read_twitter_csv("../data/rstats_tweets.csv")
+current_tweet_data <- read_twitter_csv("data/rstats_tweets.csv")
 
 
 token <- create_token(
@@ -31,4 +31,4 @@ all_data <- current_tweet_data %>%
   distinct(created_at, user_id, text, .keep_all = TRUE)
 
 all_data %>%
-  write_as_csv(file_name = "../data/rstats_tweets")
+  write_as_csv(file_name = "data/rstats_tweets")

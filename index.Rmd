@@ -141,7 +141,7 @@ by_hour %>%
 Row
 -----------------------------------------------------------------------
 
-### 💗 Most Liked Tweet Today {.tweet-title}
+### 💗 Most Liked Tweet Today
 
 ```{r}
 most_liked_url <- tweets_today %>%

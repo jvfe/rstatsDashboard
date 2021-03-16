@@ -30,7 +30,7 @@ count_timeseries <- rstats_tweets %>%
   ts_data(by = "hours")
 
 tweets_today <- rstats_tweets %>%
-  filter(created_at == today())
+  filter(created_at == today()-1)
 
 by_hour <- rstats_tweets %>%
   group_by(hour = hour(created_at)) %>%

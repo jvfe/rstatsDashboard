@@ -19,6 +19,11 @@ jobs:
         run: |
           Rscript -e "install.packages(c('dplyr','lubridate','rtweet'))"
       - name: Get data
+        env:
+          TWITTER_KEY: ${{ secrets.TWITTER_KEY }}
+          TWITTER_SECRET: ${{ secrets.TWITTER_SECRET }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          ACCESS_SECRET: ${{ secrets.ACCESS_SECRET }}
         run: |
           Rscript ./src/getData.R
       - name: Update repository

@@ -1,0 +1,35 @@
+.navbar {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  display: block;
+  position: fixed;
+  width: 200px;
+}
+
+.navbar-brand {
+  margin-right: 0 !important;
+}
+
+.navbar > .container-fluid {
+  flex-direction: column;
+}
+
+#navbar > .nav {
+  display: flex;
+  flex-direction: column;
+}
+
+#navbar {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-page-wrapper {
+  margin-top: 2em;
+}
+
+body {
+  margin-left: 200px;
+  padding-top:0px
+}

@@ -5,7 +5,10 @@ output:
     orientation: rows
     vertical_layout: scroll
     source_code: embed
-    theme: sandstone
+    theme:
+      version: 4
+      bootswatch: sandstone
+    css: ./styles/main.css
 ---
 
 ```{r setup, include=FALSE}
@@ -57,6 +60,17 @@ get_tweet_embed <- function(user, status_id) {
 }
 ```
 
+Sidebar {.sidebar}
+=====================================
+
+<div class="sidebar-pages">
+<a class="navlink" href="#home" data-toggle="tab" aria-expanded="false">Home</a>
+<a class="navlink" href="#tweets" data-toggle="tab" aria-expanded="true">Tweets</a>
+</div>
+
+
+Home
+=====================================
 
 Row
 -----------------------------------------------------------------------
@@ -137,6 +151,8 @@ by_hour %>%
     }"))
 ```
 
+Tweets
+=====================================
 
 Row
 -----------------------------------------------------------------------

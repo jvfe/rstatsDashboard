@@ -25,7 +25,7 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           ACCESS_SECRET: ${{ secrets.ACCESS_SECRET }}
         run: |
-          Rscript ./src/getData.R
+          Rscript ./R/getData.R
       - name: Update repository
         run: |
           git config --local user.email "actions@github.com"

@@ -1,11 +1,11 @@
 library(dplyr)
 library(lubridate)
 library(rtweet)
+library(dotenv)
 
 secrets <- Sys.getenv(c("TWITTER_KEY", "TWITTER_SECRET", "ACCESS_TOKEN", "ACCESS_SECRET"))
 current_date <- date(Sys.Date())
 current_tweet_data <- read_twitter_csv("data/rstats_tweets.csv")
-
 
 token <- create_token(
   app = "rtweet-exploration",

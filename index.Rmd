@@ -185,25 +185,29 @@ RBloggers
 Row {.tabset .tabset-fade data-height=1000}
 -----------------------------------------------------------------------
 
-### Top Tweets by Favourites {.tweet-wall}
+### Top Tweets - 7 days {.tweet-wall}
 
 ```{r}
-rblog_by_likes <- rbloggers %>% 
-  top_n(favorite_count, n = 8)
+rblog_7 <- rbloggers %>% 
+  mutate(created_at = as_date(created_at)) %>% 
+  filter(created_at %within% interval(start = today() - 7, end = today())) %>% 
+  slice_max(favorite_count + retweet_count, n = 8)
 
-by_likes_html <- map2_chr(rblog_by_likes$screen_name, rblog_by_likes$status_id, get_tweet_embed)
+rblog_7_html <- map2_chr(rblog_7$screen_name, rblog_7$status_id, get_tweet_embed)
 
-shiny::HTML(stringr::str_glue("{by_likes_html}"))
+shiny::HTML(stringr::str_glue("{rblog_7_html}"))
 ```
 
-### Top Tweets by Retweets {.tweet-wall}
+### Top Tweets - 30 days {.tweet-wall}
 
 ```{r}
-rblog_by_rts <- rbloggers %>% 
-  top_n(retweet_count, n = 8)
+rblog_30 <- rbloggers %>% 
+  mutate(created_at = as_date(created_at)) %>% 
+  filter(created_at %within% interval(start = today() - 30, end = today())) %>% 
+  slice_max(favorite_count + retweet_count, n = 8)
 
-by_rts_html <- map2_chr(rblog_by_rts$screen_name, rblog_by_rts$status_id, get_tweet_embed)
+rblog_30_html <- map2_chr(rblog_30$screen_name, rblog_30$status_id, get_tweet_embed)
 
-shiny::HTML(stringr::str_glue("{by_rts_html}"))
+shiny::HTML(stringr::str_glue("{rblog_30_html}"))
 ```
 

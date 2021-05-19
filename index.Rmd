@@ -18,6 +18,8 @@ library(dplyr)
 library(httr)
 library(lubridate)
 library(echarts4r)
+library(jsonlite)
+library(purrr)
 
 get_unique_value <- function(data, col) {
   col <- enquo(col)
@@ -28,6 +30,8 @@ get_unique_value <- function(data, col) {
 }
 
 rstats_tweets <- read_twitter_csv("data/rstats_tweets.csv")
+
+rbloggers <- fromJSON("data/rbloggers.json")
 
 count_timeseries <- rstats_tweets %>%
   ts_data(by = "hours")
@@ -51,12 +55,14 @@ number_of_likes <- rstats_tweets %>%
   sum()
 
 get_tweet_embed <- function(user, status_id) {
+  
   url <- stringr::str_glue("https://publish.twitter.com/oembed?url=https://twitter.com/{user}/status/{status_id}&partner=&hide_thread=false")
 
+  
   response <- GET(url) %>%
     content()
 
-  return(response$html)
+  return(shiny::HTML(response$html))
 }
 ```
 
@@ -152,7 +158,7 @@ Row
 most_liked_url <- tweets_today %>%
   slice_max(favorite_count)
 
-shiny::HTML(get_tweet_embed(most_liked_url$screen_name, most_liked_url$status_id))
+get_tweet_embed(most_liked_url$screen_name, most_liked_url$status_id)
 ```
 
 ### ✨ Most Retweeted Tweet Today {.tweet-box}
@@ -161,7 +167,7 @@ shiny::HTML(get_tweet_embed(most_liked_url$screen_name, most_liked_url$status_id
 most_retweeted <- tweets_today %>%
   slice_max(retweet_count)
 
-shiny::HTML(get_tweet_embed(most_retweeted$screen_name, most_retweeted$status_id))
+get_tweet_embed(most_retweeted$screen_name, most_retweeted$status_id)
 ```
 
 ### 🎉 Most Recent {.tweet-box}
@@ -170,8 +176,34 @@ shiny::HTML(get_tweet_embed(most_retweeted$screen_name, most_retweeted$status_id
 most_recent <- tweets_today %>%
   slice_max(created_at)
 
-shiny::HTML(get_tweet_embed(most_recent$screen_name[1], most_recent$status_id[1]))
+get_tweet_embed(most_recent$screen_name[1], most_recent$status_id[1])
 ```
 
 RBloggers
 =========
+
+Row {.tabset .tabset-fade data-height=1000}
+-----------------------------------------------------------------------
+
+### Top Tweets by Favourites {.tweet-wall}
+
+```{r}
+rblog_by_likes <- rbloggers %>% 
+  top_n(favorite_count, n = 8)
+
+by_likes_html <- map2_chr(rblog_by_likes$screen_name, rblog_by_likes$status_id, get_tweet_embed)
+
+shiny::HTML(stringr::str_glue("{by_likes_html}"))
+```
+
+### Top Tweets by Retweets {.tweet-wall}
+
+```{r}
+rblog_by_rts <- rbloggers %>% 
+  top_n(retweet_count, n = 8)
+
+by_rts_html <- map2_chr(rblog_by_rts$screen_name, rblog_by_rts$status_id, get_tweet_embed)
+
+shiny::HTML(stringr::str_glue("{by_rts_html}"))
+```
+

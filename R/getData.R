@@ -3,7 +3,6 @@ library(lubridate)
 library(jsonlite)
 library(rtweet)
 library(janitor)
-library(dotenv)
 library(logger)
 
 log_threshold(INFO)

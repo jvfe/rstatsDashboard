@@ -17,7 +17,7 @@ jobs:
           sudo apt install libcurl4-openssl-dev
       - name: Dependencies
         run: |
-          Rscript -e "install.packages(c('dplyr','lubridate','rtweet'))"
+          Rscript -e "install.packages(c('dplyr','lubridate','rtweet', 'jsonlite', 'janitor', 'logger'))"
       - name: Get data
         env:
           TWITTER_KEY: ${{ secrets.TWITTER_KEY }}

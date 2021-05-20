@@ -1,0 +1,24 @@
+Package: rtweet-exploration
+Title: Explores the R community on Twitter
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Joao Vitor",
+           family = "F. Cavalcante",
+           role = c("aut", "cre"),
+           email = "jvfecav@gmail.com",
+           comment = c(ORCID = "0000-0001-7513-7376"))
+Description: An interactive exploration of R-related Twitter data.
+License: BSD_3_clause + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.0.0
+Imports: 
+    dplyr,
+    echarts4r,
+    flexdashboard,
+    httr,
+    janitor,
+    logger,
+    lubridate,
+    rtweet

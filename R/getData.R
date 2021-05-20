@@ -1,6 +1,5 @@
 library(dplyr)
 library(lubridate)
-library(jsonlite)
 library(rtweet)
 library(janitor)
 library(logger)
@@ -47,16 +46,3 @@ all_data <- current_tweet_data %>%
 
 all_data %>%
   write_as_csv(file_name = "data/rstats_tweets")
-
-#### Updating Rbloggers JSON data ####
-
-log_info("Updating Rbloggers dataset with more recent posts")
-
-rbloggers_latest <-
-  get_timeline("Rbloggers", n = 1000, retryonratelimit = TRUE) %>% 
-  filter(created_at >= today()-30) %>% 
-  remove_empty(which="cols")
-
-rbloggers_json <- toJSON(rbloggers_latest, pretty = TRUE)
-
-write(rbloggers_json, "data/rbloggers.json")

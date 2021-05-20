@@ -1,0 +1,19 @@
+.tweet-box {
+  border: none;
+  background: none;
+}
+
+.tweet-box > .chart-title {
+  text-align: center;
+  font-size: 1.5em;
+  border: none;
+}
+
+.tweet-box > .chart-stage {
+  display: flex;
+  justify-content: center;
+}
+
+.twitter-tweet {
+  max-width: 100%;
+}

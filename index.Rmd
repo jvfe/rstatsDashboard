@@ -1,11 +1,14 @@
 ---
-title: "#rstats flexdashboard"
+title: "#rstats Twitter Explorer"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
     vertical_layout: scroll
     source_code: embed
-    theme: sandstone
+    theme:
+      version: 4
+      bootswatch: yeti
+    css: styles/main.css
 ---
 
 ```{r setup, include=FALSE}
@@ -48,12 +51,14 @@ number_of_likes <- rstats_tweets %>%
   sum()
 
 get_tweet_embed <- function(user, status_id) {
+  
   url <- stringr::str_glue("https://publish.twitter.com/oembed?url=https://twitter.com/{user}/status/{status_id}&partner=&hide_thread=false")
 
+  
   response <- GET(url) %>%
     content()
 
-  return(response$html)
+  return(shiny::HTML(response$html))
 }
 ```
 
@@ -137,33 +142,32 @@ by_hour %>%
     }"))
 ```
 
-
 Row
 -----------------------------------------------------------------------
 
-### 💗 Most Liked Tweet Today
+### 💗 Most Liked Tweet Today {.tweet-box}
 
 ```{r}
 most_liked_url <- tweets_today %>%
   slice_max(favorite_count)
 
-shiny::HTML(get_tweet_embed(most_liked_url$screen_name, most_liked_url$status_id))
+get_tweet_embed(most_liked_url$screen_name, most_liked_url$status_id)
 ```
 
-### ✨ Most Retweeted Tweet Today
+### ✨ Most Retweeted Tweet Today {.tweet-box}
 
 ```{r}
 most_retweeted <- tweets_today %>%
   slice_max(retweet_count)
 
-shiny::HTML(get_tweet_embed(most_retweeted$screen_name, most_retweeted$status_id))
+get_tweet_embed(most_retweeted$screen_name, most_retweeted$status_id)
 ```
 
-### 🎉 Most Recent
+### 🎉 Most Recent {.tweet-box}
 
 ```{r}
 most_recent <- tweets_today %>%
   slice_max(created_at)
 
-shiny::HTML(get_tweet_embed(most_recent$screen_name[1], most_recent$status_id[1]))
+get_tweet_embed(most_recent$screen_name[1], most_recent$status_id[1])
 ```

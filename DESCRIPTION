@@ -1,4 +1,4 @@
-Package: rtweet-exploration
+Package: rstatsDashboard
 Title: Explores the R community on Twitter
 Version: 0.0.0.9000
 Authors@R: 
@@ -14,6 +14,7 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.0.0
 Imports: 
+    dotenv,
     dplyr,
     echarts4r,
     flexdashboard,
@@ -21,4 +22,5 @@ Imports:
     janitor,
     logger,
     lubridate,
+    magrittr,
     rtweet

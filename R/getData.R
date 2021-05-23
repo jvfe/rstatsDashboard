@@ -6,7 +6,9 @@ library(logger)
 
 log_threshold(INFO)
 
-#### Initial setup ####
+log_info("Loading API keys and previous data")
+
+dotenv::load_dot_env()
 
 secrets <-
   Sys.getenv(c(
@@ -26,9 +28,7 @@ token <- create_token(
   access_secret = secrets["ACCESS_SECRET"]
 )
 
-#### Updating .csv tweet data ####
-
-log_info("Updating dataset with latest 3000 tweets")
+log_info("Getting latest tweets")
 
 latest_3000 <- search_tweets("#rstats",
                              n = 3000, include_rts = FALSE) %>%
@@ -43,6 +43,8 @@ all_data <- current_tweet_data %>%
   bind_rows(latest_3000) %>%
   distinct(created_at, user_id, text, .keep_all = TRUE) %>% 
   remove_empty(which="cols")
+
+log_info("Updating dataset")
 
 all_data %>%
   write_as_csv(file_name = "data/rstats_tweets")

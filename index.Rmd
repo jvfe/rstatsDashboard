@@ -18,14 +18,7 @@ library(dplyr)
 library(httr)
 library(lubridate)
 library(echarts4r)
-
-get_unique_value <- function(data, col) {
-  col <- enquo(col)
-  data %>%
-    pull(!!col) %>%
-    unique() %>%
-    length()
-}
+source('R/utils.R')
 
 rstats_tweets <- read_twitter_csv("data/rstats_tweets.csv")
 
@@ -33,7 +26,7 @@ count_timeseries <- rstats_tweets %>%
   ts_data(by = "hours")
 
 tweets_today <- rstats_tweets %>%
-  filter(created_at == today()-1)
+  filter(created_at == today())
 
 by_hour <- rstats_tweets %>%
   group_by(hour = hour(created_at)) %>%
@@ -42,26 +35,19 @@ by_hour <- rstats_tweets %>%
 
 number_of_unique_tweets <- get_unique_value(rstats_tweets, text)
 
-number_of_unique_tweets_today <- get_unique_value(tweets_today, text)
+number_of_unique_tweets_today <-
+  get_unique_value(tweets_today, text)
 
 number_of_tweeters_today <- get_unique_value(tweets_today, user_id)
 
 number_of_likes <- rstats_tweets %>%
   pull(favorite_count) %>%
   sum()
-
-get_tweet_embed <- function(user, status_id) {
-  
-  url <- stringr::str_glue("https://publish.twitter.com/oembed?url=https://twitter.com/{user}/status/{status_id}&partner=&hide_thread=false")
-
-  
-  response <- GET(url) %>%
-    content()
-
-  return(shiny::HTML(response$html))
-}
 ```
 
+
+Home
+====
 
 Row
 -----------------------------------------------------------------------
@@ -167,7 +153,14 @@ get_tweet_embed(most_retweeted$screen_name, most_retweeted$status_id)
 
 ```{r}
 most_recent <- tweets_today %>%
-  slice_max(created_at)
+  slice_max(created_at, with_ties=FALSE)
 
-get_tweet_embed(most_recent$screen_name[1], most_recent$status_id[1])
+get_tweet_embed(most_recent$screen_name, most_recent$status_id)
 ```
+
+Data
+====
+
+
+Locations
+=========

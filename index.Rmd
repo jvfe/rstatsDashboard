@@ -161,6 +161,3 @@ get_tweet_embed(most_recent$screen_name, most_recent$status_id)
 Data
 ====
 
-
-Locations
-=========

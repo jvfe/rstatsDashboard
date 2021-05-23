@@ -1,3 +1,4 @@
+library(magrittr)
 #' Get and update Tweet dataset
 #'
 #' @param hashtag The hashtag the tweets must have.
@@ -13,7 +14,7 @@
 #'
 #' @examples
 getData <- function(hashtag, n, filename, appname, ...) {
-  logger::log_threshold(INFO)
+  logger::log_threshold(logger::INFO)
   
   logger::log_info("Loading API keys and previous data")
   
@@ -50,6 +51,11 @@ getData <- function(hashtag, n, filename, appname, ...) {
       account_created_at = lubridate::as_datetime(account_created_at)
     ) %>%
     dplyr::bind_rows(latest_3000) %>%
+    # TODO: Improve this.
+    dplyr::mutate(dplyr::across(
+      dplyr::everything(),
+      ~ dplyr::na_if(., stringr::str_match_all(., "[NA NA]+"))
+    )) %>%
     dplyr::distinct(created_at, user_id, text, .keep_all = TRUE) %>%
     janitor::remove_empty(which = "cols")
   

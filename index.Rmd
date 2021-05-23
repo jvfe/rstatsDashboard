@@ -82,10 +82,11 @@ Row {.tabset .tabset-fade data-width=400}
 ### Tweet volume
 
 ```{r}
+this_month <- floor_date(today(), "month")
+
 count_timeseries %>%
   e_charts(time) %>%
-  e_line(n, name = "# of tweets", smooth = TRUE) %>%
-  e_datazoom(type = "slider") %>%
+  e_line(n, name = "# of tweets", smooth = TRUE, legend = FALSE) %>%
   e_x_axis(
     type = "time",
     formatter = htmlwidgets::JS(
@@ -106,7 +107,37 @@ count_timeseries %>%
       let title = `<strong>${date.toLocaleDateString('en-US', options=options)}</strong>`
       let num = `${params[0].value[1]} tweets`
       return(`${title}</br>${num}`);
-    }"))
+    }")) %>% 
+  e_datazoom(type = "slider") %>%
+  e_zoom(
+    dataZoomIndex = 0,
+    start = 70,
+    end = 100
+  ) %>% 
+  e_zoom( 
+    dataZoomIndex = 0,
+    startValue = today() - 7,
+    endValue = today(),
+    btn = "weekBtn"
+  ) %>% 
+  e_zoom( 
+    dataZoomIndex = 0,
+    startValue = this_month,
+    endValue = today(),
+    btn = "monthBtn"
+  ) %>% 
+  e_button(
+    id = "weekBtn",
+    position = "top",
+    class = "btn btn-primary btn-sm",
+    "This Week"
+  ) %>% 
+  e_button(
+    id = "monthBtn",
+    position = "top",
+    class = "btn btn-primary btn-sm",
+    "This Month"
+  )
 ```
 
 ### Tweets by Hour of Day
@@ -114,7 +145,7 @@ count_timeseries %>%
 ```{r}
 by_hour %>%
   e_charts(hour) %>%
-  e_step(count, name = "Tweets", step = "middle") %>%
+  e_step(count, name = "Tweets", step = "middle", legend = FALSE) %>%
   e_x_axis(
     min = 0,
     max = 23,

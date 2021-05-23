@@ -18,7 +18,7 @@ library(dplyr)
 library(httr)
 library(lubridate)
 library(echarts4r)
-source('R/utils.R')
+devtools::load_all()
 
 rstats_tweets <- read_twitter_csv("data/rstats_tweets.csv")
 

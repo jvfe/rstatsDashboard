@@ -49,7 +49,7 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           ACCESS_SECRET: ${{ secrets.ACCESS_SECRET }}
         run: |
-          Rscript ./R/getData.R
+          Rscript ./scripts/getData.R
 
       - name: Update data
         run: |

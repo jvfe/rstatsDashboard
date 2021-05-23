@@ -85,6 +85,7 @@ Row {.tabset .tabset-fade data-width=400}
 count_timeseries %>%
   e_charts(time) %>%
   e_line(n, name = "# of tweets", smooth = TRUE) %>%
+  e_datazoom(type = "slider") %>%
   e_x_axis(
     type = "time",
     formatter = htmlwidgets::JS(

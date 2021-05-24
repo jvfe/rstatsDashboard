@@ -18,7 +18,7 @@ getData <- function(hashtag, n, filename, appname, ...) {
   
   logger::log_info("Loading API keys and previous data")
   
-  dotenv::load_dot_env()
+  try(dotenv::load_dot_env(), silent = TRUE)
   
   secrets <-
     Sys.getenv(c(

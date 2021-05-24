@@ -76,7 +76,7 @@ valueBox(number_of_likes, icon = "fa-heart", color = "palevioletred")
 valueBox(number_of_unique_tweets, icon = "fa-comments", color = "mediumorchid")
 ```
 
-Row {.tabset .tabset-fade data-width=400}
+Row {.tabset .tabset-fade}
 -----------------------------------------------------------------------
 
 ### Tweet volume

@@ -237,3 +237,17 @@ tweets_week %>%
     )
   )
 ```
+
+
+Rankings
+=========
+
+### Top Tweeters
+
+```{r}
+
+```
+
+### Top Hashtags
+
+### Top Words

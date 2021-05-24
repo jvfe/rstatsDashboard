@@ -18,12 +18,16 @@ library(dplyr)
 library(httr)
 library(lubridate)
 library(echarts4r)
+library(DT)
 devtools::load_all()
 
 rstats_tweets <- read_twitter_csv("data/rstats_tweets.csv")
 
 count_timeseries <- rstats_tweets %>%
   ts_data(by = "hours")
+
+tweets_week <- rstats_tweets %>%
+  filter(as_datetime(created_at) %within% interval(floor_date(today(), "week"), today()))
 
 tweets_today <- rstats_tweets %>%
   filter(created_at == today())
@@ -190,6 +194,46 @@ most_recent <- tweets_today %>%
 get_tweet_embed(most_recent$screen_name, most_recent$status_id)
 ```
 
-Data
-====
+Data 
+==============
 
+### Tweets in the current week
+
+```{r}
+tweets_week %>%
+  select(
+    status_url,
+    created_at,
+    screen_name,
+    text,
+    retweet_count,
+    favourites_count,
+    mentions_screen_name
+  ) %>%
+  mutate(
+    status_url = stringr::str_glue("<a href=\"{status_url}\" target=\"_blank\">On Twitter</a>")
+  ) %>%
+  datatable(
+    .,
+    extensions = "Buttons",
+    rownames = FALSE,
+    escape = FALSE,
+    colnames = c("Timestamp", "User", "Tweet", "RT", "Fav", "Mentioned"),
+    filter = 'top',
+    options = list(
+      columnDefs = list(list(
+        targets = 0, searchable = FALSE
+      )),
+      lengthMenu = c(5, 10, 25, 50, 100),
+      pageLength = 10,
+      scrollY = 600,
+      scroller = TRUE,
+      dom = '<"d-flex justify-content-between"lBf>rtip',
+      buttons = list('copy', list(
+        extend = 'collection',
+        buttons = c('csv', 'excel'),
+        text = 'Download'
+      ))
+    )
+  )
+```

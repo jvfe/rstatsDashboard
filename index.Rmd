@@ -11,15 +11,19 @@ output:
     css: styles/main.css
 ---
 
-```{r setup, include=FALSE}
+```{r load_package, include=FALSE}
+devtools::load_all()
+```
+
+```{r setup, include=FALSE, cache=TRUE}
 library(flexdashboard)
 library(rtweet)
 library(dplyr)
-library(httr)
+library(stringr)
+library(tidytext)
 library(lubridate)
 library(echarts4r)
 library(DT)
-devtools::load_all()
 
 rstats_tweets <- read_twitter_csv("data/rstats_tweets.csv")
 
@@ -60,16 +64,29 @@ top_tweeters <- rstats_tweets %>%
   ) %>%
   select(screen_name, engagement)
 
-top_hashtags <- rstats_tweets %>% 
-    tidyr::separate_rows(hashtags, sep = " ") %>% 
-    count(hashtags) %>% 
-    filter(!(hashtags %in% c("rstats", "RStats"))) %>% 
-    slice_max(n, n = 10, with_ties = FALSE) %>% 
-    mutate(
-      number = formattable::color_bar("lightgray", formattable::proportion)(n),
-      hashtag = stringr::str_glue('<a href="https://twitter.com/hashtag/{hashtags}" target="_blank">#{hashtags}</a>'),
-    ) %>% 
+top_hashtags <- rstats_tweets %>%
+  tidyr::separate_rows(hashtags, sep = " ") %>%
+  count(hashtags) %>%
+  filter(!(hashtags %in% c("rstats", "RStats"))) %>%
+  slice_max(n, n = 10, with_ties = FALSE) %>%
+  mutate(
+    number = formattable::color_bar("plum", formattable::proportion)(n),
+    hashtag = stringr::str_glue(
+      '<a href="https://twitter.com/hashtag/{hashtags}" target="_blank">#{hashtags}</a>'
+    ),
+  ) %>%
   select(hashtag, number)
+
+word_banlist <-  c("t.co", "https", "rstats")
+top_words <- rstats_tweets %>%
+  select(text) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  filter(!(word %in% word_banlist)) %>%
+  filter(nchar(word) >= 4) %>% 
+  count(word, sort = TRUE) %>%
+  slice_max(n, n = 10, with_ties = FALSE) %>%     mutate(number = formattable::color_bar("peachpuff", formattable::proportion)(n)) %>%
+  select(word, number)
 ```
 
 
@@ -228,30 +245,47 @@ Row
 ```{r}
 top_tweeters %>%
   knitr::kable(
-        format = "html",
-        escape = FALSE,
-        align = "cll",
-        col.names = c("User", "Engagement/Tweet "),
-        table.attr = 'class = "table"'
-      )
+    format = "html",
+    escape = FALSE,
+    align = "cll",
+    col.names = c("User", "Engagement/Tweet "),
+    table.attr = 'class = "table"'
+  )
 ```
 
 Where Engagement is RT * 2 + Favourite
+
+Row
+-----------------------------------------------------------------------
 
 ### Top Hashtags
 
 ```{r}
 top_hashtags %>%
   knitr::kable(
-        format = "html",
-        escape = FALSE,
-        align = "cll",
-        col.names = c("Hashtag", ""),
-        table.attr = 'class = "table"'
-      )
+    format = "html",
+    escape = FALSE,
+    align = "cll",
+    col.names = c("Hashtag", "Count"),
+    table.attr = 'class = "table"'
+  )
 ```
 
 Excluding `#rstats` and similar variations
+
+
+### Top Words
+
+```{r}
+top_words %>%
+  knitr::kable(
+    format = "html",
+    escape = FALSE,
+    align = "cll",
+    col.names = c("Word", "Count"),
+    table.attr = 'class = "table"'
+  )
+```
 
 Data 
 ==============

@@ -26,4 +26,5 @@ Imports:
     logger,
     lubridate,
     magrittr,
-    rtweet
+    rtweet,
+    tidytext

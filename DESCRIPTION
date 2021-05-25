@@ -20,6 +20,7 @@ Imports:
     DT,
     echarts4r,
     flexdashboard,
+    formattable,
     httr,
     janitor,
     logger,

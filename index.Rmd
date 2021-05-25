@@ -47,6 +47,19 @@ number_of_tweeters_today <- get_unique_value(tweets_today, user_id)
 number_of_likes <- rstats_tweets %>%
   pull(favorite_count) %>%
   sum()
+
+top_tweeters <- rstats_tweets %>%
+  group_by(screen_name, profile_url, profile_image_url) %>%
+  summarize(engagement = (sum(retweet_count) * 2 + sum(favorite_count)) / n()) %>%
+  ungroup() %>%
+  slice_max(engagement, n = 10, with_ties = FALSE) %>%
+  mutate(
+    profile_url = stringr::str_glue("https://twitter.com/{screen_name}"),
+    screen_name = stringr::str_glue('<a href="{profile_url}" target="_blank">@{screen_name}</a>'),
+    engagement = formattable::color_bar("#a3c1e0", formattable::proportion)(engagement)
+  ) %>%
+  select(screen_name, engagement)
+
 ```
 
 
@@ -194,6 +207,34 @@ most_recent <- tweets_today %>%
 get_tweet_embed(most_recent$screen_name, most_recent$status_id)
 ```
 
+Rankings
+=========
+
+Row
+-----------------------------------------------------------------------
+
+### Top Tweeters
+
+```{r}
+top_tweeters %>%
+  knitr::kable(
+        format = "html",
+        escape = FALSE,
+        align = "cll",
+        col.names = c("User", "Engagement/Tweet "),
+        table.attr = 'class = "table"'
+      )
+```
+
+Where Engagement is RT * 2 + Favourite
+
+### Top Hashtags
+
+```{r}
+
+```
+
+
 Data 
 ==============
 
@@ -238,16 +279,3 @@ tweets_week %>%
   )
 ```
 
-
-Rankings
-=========
-
-### Top Tweeters
-
-```{r}
-
-```
-
-### Top Hashtags
-
-### Top Words

@@ -60,6 +60,16 @@ top_tweeters <- rstats_tweets %>%
   ) %>%
   select(screen_name, engagement)
 
+top_hashtags <- rstats_tweets %>% 
+    tidyr::separate_rows(hashtags, sep = " ") %>% 
+    count(hashtags) %>% 
+    filter(!(hashtags %in% c("rstats", "RStats"))) %>% 
+    slice_max(n, n = 10, with_ties = FALSE) %>% 
+    mutate(
+      number = formattable::color_bar("lightgray", formattable::proportion)(n),
+      hashtag = stringr::str_glue('<a href="https://twitter.com/hashtag/{hashtags}" target="_blank">#{hashtags}</a>'),
+    ) %>% 
+  select(hashtag, number)
 ```
 
 
@@ -231,9 +241,17 @@ Where Engagement is RT * 2 + Favourite
 ### Top Hashtags
 
 ```{r}
-
+top_hashtags %>%
+  knitr::kable(
+        format = "html",
+        escape = FALSE,
+        align = "cll",
+        col.names = c("Hashtag", ""),
+        table.attr = 'class = "table"'
+      )
 ```
 
+Excluding `#rstats` and similar variations
 
 Data 
 ==============

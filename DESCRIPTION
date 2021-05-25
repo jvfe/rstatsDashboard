@@ -17,6 +17,7 @@ Imports:
     devtools,
     dotenv,
     dplyr,
+    DT,
     echarts4r,
     flexdashboard,
     httr,

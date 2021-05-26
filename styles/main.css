@@ -27,3 +27,7 @@ blockquote.twitter-tweet {
 .twitter-tweet {
   max-width: 100%;
 }
+
+.datatable-container {
+  max-width: 100%;
+}

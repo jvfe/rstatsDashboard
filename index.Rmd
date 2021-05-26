@@ -253,7 +253,7 @@ top_tweeters %>%
   )
 ```
 
-Where Engagement is RT * 2 + Favourite
+Where Engagement is `RT * 2 + Favourite`
 
 Row
 -----------------------------------------------------------------------
@@ -290,7 +290,7 @@ top_words %>%
 Data 
 ==============
 
-### Tweets in the current week
+### Tweets in the current week {.datatable-container}
 
 ```{r}
 tweets_week %>%
@@ -300,7 +300,7 @@ tweets_week %>%
     screen_name,
     text,
     retweet_count,
-    favourites_count,
+    favorite_count,
     mentions_screen_name
   ) %>%
   mutate(

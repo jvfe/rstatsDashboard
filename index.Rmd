@@ -260,6 +260,7 @@ Where Engagement is `RT * 2 + Favourite`
 ### Network of top tweeters
 
 Relationships in the graph describe replies and quote retweets from the top tweeters
+that also have the hashtag.
 
 ```{r}
 edgelist <-
@@ -286,6 +287,22 @@ e_charts() %>%
 Row
 -----------------------------------------------------------------------
 
+### Top Words
+
+```{r}
+top_words %>%
+  knitr::kable(
+    format = "html",
+    escape = FALSE,
+    align = "cll",
+    col.names = c("Word", "Count"),
+    table.attr = 'class = "table"'
+  )
+```
+
+Row
+-----------------------------------------------------------------------
+
 ### Top Hashtags
 
 ```{r}
@@ -301,19 +318,29 @@ top_hashtags %>%
 
 Excluding `#rstats` and similar variations
 
-### Top Words
+### Common co-occuring hashtags
 
 ```{r}
-top_words %>%
-  knitr::kable(
-    format = "html",
-    escape = FALSE,
-    align = "cll",
-    col.names = c("Word", "Count"),
-    table.attr = 'class = "table"'
-  )
-```
+top_co_hashtags <- rstats_tweets %>% 
+  unnest_tokens(bigram, hashtags, token = "ngrams", n = 2) %>% 
+  tidyr::separate(bigram, c("word1", "word2"), sep = " ") %>% 
+  filter(!word1 %in% c(stop_words$word, word_banlist)) %>% 
+  filter(!word2 %in% c(stop_words$word, word_banlist)) %>% 
+  count(word1, word2, sort = TRUE) %>% 
+  filter(!is.na(word1) & !is.na(word2)) %>% 
+  slice_max(n, n = 100, with_ties = FALSE)
 
+
+top_co_hash_nodes <- tibble(
+  nodes = c(top_co_hashtags$word1, top_co_hashtags$word2)
+) %>% 
+  distinct()
+
+e_chart() %>% 
+  e_graph() %>% 
+  e_graph_nodes(top_co_hash_nodes, nodes, nodes, nodes) %>% 
+  e_graph_edges(top_co_hashtags, word1, word2)
+```
 
 
 Data 

@@ -53,10 +53,12 @@ number_of_likes <- rstats_tweets %>%
   sum()
 
 top_tweeters <- rstats_tweets %>%
-  group_by(screen_name, profile_url, profile_image_url) %>%
+  group_by(user_id, screen_name, profile_url, profile_image_url) %>%
   summarize(engagement = (sum(retweet_count) * 2 + sum(favorite_count)) / n()) %>%
   ungroup() %>%
-  slice_max(engagement, n = 10, with_ties = FALSE) %>%
+  slice_max(engagement, n = 10, with_ties = FALSE)
+
+top_tweeters_format <- top_tweeters %>% 
   mutate(
     profile_url = stringr::str_glue("https://twitter.com/{screen_name}"),
     screen_name = stringr::str_glue('<a href="{profile_url}" target="_blank">@{screen_name}</a>'),
@@ -243,7 +245,7 @@ Row
 ### Top Tweeters
 
 ```{r}
-top_tweeters %>%
+top_tweeters_format %>%
   knitr::kable(
     format = "html",
     escape = FALSE,
@@ -254,6 +256,32 @@ top_tweeters %>%
 ```
 
 Where Engagement is `RT * 2 + Favourite`
+
+### Network of top tweeters
+
+Relationships in the graph describe replies and quote retweets from the top tweeters
+
+```{r}
+edgelist <-
+  network_data(rstats_tweets %>% unflatten(), "reply,quote")
+nodelist <- attr(edgelist, "idsn") %>%
+  bind_cols()
+
+top_edges <- edgelist %>%
+  filter((from %in% top_tweeters$user_id) |
+           (to %in% top_tweeters$user_id))
+
+top_nodes <- nodelist %>%
+  filter((id %in% top_edges$from) | (id %in% top_edges$to)) %>%
+  mutate(is_top = ifelse((id %in% top_tweeters$user_id), "yes", "no"),
+         size = 10)
+
+e_charts() %>%
+  e_graph() %>%
+  e_graph_nodes(top_nodes, id, sn, size, category = is_top, legend = FALSE) %>%
+  e_graph_edges(top_edges, from, to) %>%
+  e_tooltip()
+```
 
 Row
 -----------------------------------------------------------------------
@@ -273,7 +301,6 @@ top_hashtags %>%
 
 Excluding `#rstats` and similar variations
 
-
 ### Top Words
 
 ```{r}
@@ -286,6 +313,8 @@ top_words %>%
     table.attr = 'class = "table"'
   )
 ```
+
+
 
 Data 
 ==============

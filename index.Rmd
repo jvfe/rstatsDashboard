@@ -101,7 +101,7 @@ top_co_hashtags <- rstats_tweets %>%
 ```
 
 
-Home
+Home {data-icon="ion-home"}
 ====
 
 Row
@@ -245,7 +245,7 @@ most_recent <- tweets_today %>%
 get_tweet_embed(most_recent$screen_name, most_recent$status_id)
 ```
 
-Rankings
+Rankings {data-icon="ion-arrow-graph-up-right"}
 =========
 
 Row
@@ -345,7 +345,7 @@ e_chart() %>%
 ```
 
 
-Data 
+Data {data-icon="ion-stats-bars"}
 ==============
 
 ### Tweets in the current week {.datatable-container}

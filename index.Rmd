@@ -89,6 +89,15 @@ top_words <- rstats_tweets %>%
   count(word, sort = TRUE) %>%
   slice_max(n, n = 10, with_ties = FALSE) %>%     mutate(number = formattable::color_bar("peachpuff", formattable::proportion)(n)) %>%
   select(word, number)
+
+top_co_hashtags <- rstats_tweets %>% 
+  unnest_tokens(bigram, hashtags, token = "ngrams", n = 2) %>% 
+  tidyr::separate(bigram, c("word1", "word2"), sep = " ") %>% 
+  filter(!word1 %in% c(stop_words$word, word_banlist)) %>% 
+  filter(!word2 %in% c(stop_words$word, word_banlist)) %>% 
+  count(word1, word2, sort = TRUE) %>% 
+  filter(!is.na(word1) & !is.na(word2)) %>% 
+  slice_max(n, n = 100, with_ties = FALSE)
 ```
 
 
@@ -100,25 +109,25 @@ Row
 
 ### Tweets Today
 
-```{r}
+```{r tweets_today}
 valueBox(number_of_unique_tweets_today, icon = "fa-comment-alt", color = "plum")
 ```
 
 ### Tweeters Today
 
-```{r}
+```{r tweeters_today}
 valueBox(number_of_tweeters_today, icon = "fa-user", color = "peachpuff")
 ```
 
 ### #rstats Likes
 
-```{r}
+```{r likes}
 valueBox(number_of_likes, icon = "fa-heart", color = "palevioletred")
 ```
 
 ### #rstats Tweets
 
-```{r}
+```{r unique_tweets}
 valueBox(number_of_unique_tweets, icon = "fa-comments", color = "mediumorchid")
 ```
 
@@ -127,7 +136,7 @@ Row {.tabset .tabset-fade}
 
 ### Tweet volume
 
-```{r}
+```{r tweet_volume}
 this_month <- floor_date(today(), "month")
 
 count_timeseries %>%
@@ -188,7 +197,7 @@ count_timeseries %>%
 
 ### Tweets by Hour of Day
 
-```{r}
+```{r tweets_by_hour}
 by_hour %>%
   e_charts(hour) %>%
   e_step(count, name = "Tweets", step = "middle", legend = FALSE) %>%
@@ -211,7 +220,7 @@ Row
 
 ### 💗 Most Liked Tweet Today {.tweet-box}
 
-```{r}
+```{r most_liked}
 most_liked_url <- tweets_today %>%
   slice_max(favorite_count)
 
@@ -220,7 +229,7 @@ get_tweet_embed(most_liked_url$screen_name, most_liked_url$status_id)
 
 ### ✨ Most Retweeted Tweet Today {.tweet-box}
 
-```{r}
+```{r most_rt}
 most_retweeted <- tweets_today %>%
   slice_max(retweet_count)
 
@@ -229,7 +238,7 @@ get_tweet_embed(most_retweeted$screen_name, most_retweeted$status_id)
 
 ### 🎉 Most Recent {.tweet-box}
 
-```{r}
+```{r most_recent}
 most_recent <- tweets_today %>%
   slice_max(created_at, with_ties=FALSE)
 
@@ -244,7 +253,7 @@ Row
 
 ### Top Tweeters
 
-```{r}
+```{r top_tweeters}
 top_tweeters_format %>%
   knitr::kable(
     format = "html",
@@ -262,7 +271,7 @@ Where Engagement is `RT * 2 + Favourite`
 Relationships in the graph describe replies and quote retweets from the top tweeters
 that also have the hashtag.
 
-```{r}
+```{r top_tweeters_net}
 edgelist <-
   network_data(rstats_tweets %>% unflatten(), "reply,quote")
 nodelist <- attr(edgelist, "idsn") %>%
@@ -289,7 +298,7 @@ Row
 
 ### Top Words
 
-```{r}
+```{r top_words}
 top_words %>%
   knitr::kable(
     format = "html",
@@ -305,7 +314,7 @@ Row
 
 ### Top Hashtags
 
-```{r}
+```{r top_hashtags}
 top_hashtags %>%
   knitr::kable(
     format = "html",
@@ -320,17 +329,9 @@ Excluding `#rstats` and similar variations
 
 ### Common co-occuring hashtags
 
-```{r}
-top_co_hashtags <- rstats_tweets %>% 
-  unnest_tokens(bigram, hashtags, token = "ngrams", n = 2) %>% 
-  tidyr::separate(bigram, c("word1", "word2"), sep = " ") %>% 
-  filter(!word1 %in% c(stop_words$word, word_banlist)) %>% 
-  filter(!word2 %in% c(stop_words$word, word_banlist)) %>% 
-  count(word1, word2, sort = TRUE) %>% 
-  filter(!is.na(word1) & !is.na(word2)) %>% 
-  slice_max(n, n = 100, with_ties = FALSE)
+Hashtags that occur together, grouped by community detection
 
-
+```{r co_hashtags}
 top_co_hash_nodes <- tibble(
   nodes = c(top_co_hashtags$word1, top_co_hashtags$word2)
 ) %>% 
@@ -339,7 +340,8 @@ top_co_hash_nodes <- tibble(
 e_chart() %>% 
   e_graph() %>% 
   e_graph_nodes(top_co_hash_nodes, nodes, nodes, nodes) %>% 
-  e_graph_edges(top_co_hashtags, word1, word2)
+  e_graph_edges(top_co_hashtags, word1, word2) %>% 
+  e_modularity()
 ```
 
 
@@ -348,7 +350,7 @@ Data
 
 ### Tweets in the current week {.datatable-container}
 
-```{r}
+```{r datatable}
 tweets_week %>%
   select(
     status_url,

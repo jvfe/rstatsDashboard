@@ -36,11 +36,6 @@ tweets_week <- rstats_tweets %>%
 tweets_today <- rstats_tweets %>%
   filter(created_at == today())
 
-by_hour <- rstats_tweets %>%
-  group_by(hour = hour(created_at)) %>%
-  summarise(count = n()) %>%
-  ungroup()
-
 number_of_unique_tweets <- get_unique_value(rstats_tweets, text)
 
 number_of_unique_tweets_today <-
@@ -137,82 +132,13 @@ Row {.tabset .tabset-fade}
 ### Tweet volume
 
 ```{r tweet_volume}
-this_month <- floor_date(today(), "month")
-
-count_timeseries %>%
-  e_charts(time) %>%
-  e_line(n, name = "# of tweets", smooth = TRUE, legend = FALSE) %>%
-  e_x_axis(
-    type = "time",
-    formatter = htmlwidgets::JS(
-      "function(value){
-        let date = new Date(value);
-        
-        label = `${date.getDate()}-${(parseInt(date.getMonth()) + 1)}-${date.getFullYear()}`;
-        return label;
-      }"
-    )
-  ) %>%
-  e_axis_labels(y = "Tweets") %>%
-  e_theme("westeros") %>%
-  e_tooltip(trigger = "axis", formatter = htmlwidgets::JS("
-    function(params) {
-      let date = new Date(params[0].value[0])
-      let options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric'}
-      let title = `<strong>${date.toLocaleDateString('en-US', options=options)}</strong>`
-      let num = `${params[0].value[1]} tweets`
-      return(`${title}</br>${num}`);
-    }")) %>% 
-  e_datazoom(type = "slider") %>%
-  e_zoom(
-    dataZoomIndex = 0,
-    start = 70,
-    end = 100
-  ) %>% 
-  e_zoom( 
-    dataZoomIndex = 0,
-    startValue = today() - 7,
-    endValue = today(),
-    btn = "weekBtn"
-  ) %>% 
-  e_zoom( 
-    dataZoomIndex = 0,
-    startValue = this_month,
-    endValue = today(),
-    btn = "monthBtn"
-  ) %>% 
-  e_button(
-    id = "weekBtn",
-    position = "top",
-    class = "btn btn-primary btn-sm",
-    "This Week"
-  ) %>% 
-  e_button(
-    id = "monthBtn",
-    position = "top",
-    class = "btn btn-primary btn-sm",
-    "This Month"
-  )
+plot_tweet_volume(count_timeseries)
 ```
 
 ### Tweets by Hour of Day
 
 ```{r tweets_by_hour}
-by_hour %>%
-  e_charts(hour) %>%
-  e_step(count, name = "Tweets", step = "middle", legend = FALSE) %>%
-  e_x_axis(
-    min = 0,
-    max = 23,
-  ) %>%
-  e_axis_labels(x = "Time of Day (UTC)", y = "Tweets") %>%
-  e_theme("westeros") %>%
-  e_tooltip(trigger = "axis", formatter = htmlwidgets::JS("
-    function(params) {
-      let title = `<strong>${params[0].value[0]}h</strong>`
-      let num = `${params[0].value[1]} tweets`
-      return(`${title}</br>${num}`);
-    }"))
+plot_tweet_by_hour(rstats_tweets)
 ```
 
 Row

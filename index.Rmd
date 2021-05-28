@@ -11,11 +11,11 @@ output:
     css: styles/main.css
 ---
 
-```{r load_package, include=FALSE}
+```{r load_proj, include=FALSE}
 devtools::load_all()
 ```
 
-```{r setup, include=FALSE, cache=TRUE}
+```{r load_packages, include=FALSE, cache=TRUE}
 library(flexdashboard)
 library(rtweet)
 library(dplyr)
@@ -26,7 +26,10 @@ library(echarts4r)
 library(DT)
 
 rstats_tweets <- read_twitter_csv("data/rstats_tweets.csv")
+```
 
+
+```{r time_data, include=FALSE, cache=TRUE}
 count_timeseries <- rstats_tweets %>%
   ts_data(by = "hours")
 
@@ -35,7 +38,10 @@ tweets_week <- rstats_tweets %>%
 
 tweets_today <- rstats_tweets %>%
   filter(created_at == today())
+```
 
+
+```{r numbers, include=FALSE, cache=TRUE}
 number_of_unique_tweets <- get_unique_value(rstats_tweets, text)
 
 number_of_unique_tweets_today <-
@@ -46,7 +52,10 @@ number_of_tweeters_today <- get_unique_value(tweets_today, user_id)
 number_of_likes <- rstats_tweets %>%
   pull(favorite_count) %>%
   sum()
+```
 
+
+```{r rankings_data, include=FALSE, cache=TRUE}
 top_tweeters <- rstats_tweets %>%
   group_by(user_id, screen_name, profile_url, profile_image_url) %>%
   summarize(engagement = (sum(retweet_count) * 2 + sum(favorite_count)) / n()) %>%

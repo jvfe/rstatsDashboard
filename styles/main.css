@@ -31,3 +31,7 @@ blockquote.twitter-tweet {
 .datatable-container {
   max-width: 100%;
 }
+
+.chart-stage .echarts4r {
+  max-height: 25em !important;
+}

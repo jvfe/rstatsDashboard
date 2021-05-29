@@ -157,7 +157,7 @@ Row
 
 ```{r most_liked}
 most_liked_url <- tweets_today %>%
-  slice_max(favorite_count)
+  slice_max(favorite_count, with_ties = FALSE)
 
 get_tweet_embed(most_liked_url$screen_name, most_liked_url$status_id)
 ```
@@ -166,7 +166,7 @@ get_tweet_embed(most_liked_url$screen_name, most_liked_url$status_id)
 
 ```{r most_rt}
 most_retweeted <- tweets_today %>%
-  slice_max(retweet_count)
+  slice_max(retweet_count, with_ties = FALSE)
 
 get_tweet_embed(most_retweeted$screen_name, most_retweeted$status_id)
 ```

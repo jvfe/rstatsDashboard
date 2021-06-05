@@ -27,8 +27,6 @@ getData <- function(hashtag, n, filename, appname, ...) {
       "ACCESS_SECRET"
     ))
   
-  current_tweet_data <- rtweet::read_twitter_csv(filename)
-  
   token <- rtweet::create_token(
     app = appname,
     consumer_key = secrets["TWITTER_KEY"],
@@ -43,20 +41,25 @@ getData <- function(hashtag, n, filename, appname, ...) {
                                        n = n, ...) %>%
     rtweet::flatten()
   
-  all_data <- current_tweet_data %>%
-    dplyr::mutate(
-      created_at = lubridate::as_datetime(created_at),
-      quoted_created_at = lubridate::as_datetime(quoted_created_at),
-      account_created_at = lubridate::as_datetime(account_created_at)
-    ) %>%
-    dplyr::bind_rows(latest_3000) %>%
-    # TODO: Improve this.
-    dplyr::mutate(dplyr::across(
-      dplyr::everything(),
-      ~ dplyr::na_if(., stringr::str_match_all(., "[NA NA]+"))
-    )) %>%
-    dplyr::distinct(created_at, user_id, text, .keep_all = TRUE) %>%
-    janitor::remove_empty(which = "cols")
+  if (file.exists(filename)) {
+    current_tweet_data <- rtweet::read_twitter_csv(filename)
+    all_data <- current_tweet_data %>%
+      dplyr::mutate(
+        created_at = lubridate::as_datetime(created_at),
+        quoted_created_at = lubridate::as_datetime(quoted_created_at),
+        account_created_at = lubridate::as_datetime(account_created_at)
+      ) %>%
+      dplyr::bind_rows(latest_3000) %>%
+      clean_data(.)
+  } else {
+    all_data <- latest_3000 %>%
+      dplyr::mutate(
+        created_at = lubridate::as_datetime(created_at),
+        quoted_created_at = lubridate::as_datetime(quoted_created_at),
+        account_created_at = lubridate::as_datetime(account_created_at)
+      ) %>%
+      clean_data(.)
+  }
   
   logger::log_info("Updating dataset")
   
@@ -65,6 +68,18 @@ getData <- function(hashtag, n, filename, appname, ...) {
   readr::write_csv(all_data,
                    filename,
                    na = "")
+
+}
+
+clean_data <- function(dataset) {
+  dataset %>%
+    # TODO: Improve this.
+    dplyr::mutate(dplyr::across(
+      dplyr::everything(),
+      ~ dplyr::na_if(., stringr::str_match_all(., "[NA NA]+"))
+    )) %>%
+    dplyr::distinct(created_at, user_id, text, .keep_all = TRUE) %>%
+    janitor::remove_empty(which = "cols")
 
 }
 

@@ -4,6 +4,6 @@ devtools::load_all()
 
 getData("#rstats",
         3000,
-        "data/rstats_tweets.csv",
+        "data/rstats_tweets.csv.gz",
         "rtweet-exploration",
         include_rts = FALSE)

@@ -60,7 +60,37 @@ getData <- function(hashtag, n, filename, appname, ...) {
   
   logger::log_info("Updating dataset")
   
-  all_data %>%
-    rtweet::write_as_csv(file_name = filename)
+  all_data <- prepend_ids(rtweet::flatten(all_data))
   
+  readr::write_csv(all_data,
+                   filename,
+                   na = "")
+
+}
+
+# Functions from the rtweet package to clean IDs
+#License: MIT
+#YEAR: 2016
+#COPYRIGHT HOLDER: Michael W. Kearney
+prepend_ids <- function(x) {
+  ids <- grepl("\\_id$", names(x))
+  x[ids] <- lapply(x[ids], x_ids)
+  x
+}
+
+x_ids <- function(x) {
+  if (is.recursive(x)) {
+    x <- lapply(x, function(.)
+      ifelse(
+        length(.) == 0 || (length(.) == 1 && is.na(.)),
+        list(NA_character_),
+        list(paste0("x", .))
+      ))
+    x <- lapply(x, unlist, recursive = FALSE)
+  } else {
+    x[x == ""] <- NA_character_
+    x[!is.na(x)] <- paste0("x", x[!is.na(x)])
+    x[!is.na(x)] <- gsub(" ", " x", x[!is.na(x)])
+  }
+  x
 }

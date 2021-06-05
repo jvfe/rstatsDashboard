@@ -25,7 +25,8 @@ library(lubridate)
 library(echarts4r)
 library(DT)
 
-rstats_tweets <- read_twitter_csv("data/rstats_tweets.csv")
+rstats_tweets <- read_twitter_csv("data/rstats_tweets.csv.gz") %>%
+  mutate(created_at = as_datetime(created_at))
 ```
 
 
@@ -34,10 +35,10 @@ count_timeseries <- rstats_tweets %>%
   ts_data(by = "hours")
 
 tweets_week <- rstats_tweets %>%
-  filter(as_datetime(created_at) %within% interval(floor_date(today(), "week"), today()))
+  filter(created_at %within% interval(floor_date(today(), "week"), today()))
 
 tweets_today <- rstats_tweets %>%
-  filter(created_at == today())
+  filter(date(created_at) == today())
 ```
 
 

@@ -35,7 +35,7 @@ count_timeseries <- rstats_tweets %>%
   ts_data(by = "hours")
 
 tweets_week <- rstats_tweets %>%
-  filter(created_at %within% interval(floor_date(today(), "week"), today()))
+  filter(date(created_at) %within% interval(floor_date(today(), "week"), today()))
 
 tweets_today <- rstats_tweets %>%
   filter(date(created_at) == today())

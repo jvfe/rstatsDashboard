@@ -92,8 +92,8 @@ top_words <- rstats_tweets %>%
   filter(!(word %in% word_banlist)) %>%
   filter(nchar(word) >= 4) %>% 
   count(word, sort = TRUE) %>%
-  slice_max(n, n = 10, with_ties = FALSE) %>%     mutate(number = formattable::color_bar("peachpuff", formattable::proportion)(n)) %>%
-  select(word, number)
+  slice_max(n, n = 10, with_ties = FALSE) %>%
+  select(word, n)
 
 top_co_hashtags <- rstats_tweets %>% 
   unnest_tokens(bigram, hashtags, token = "ngrams", n = 2) %>% 
@@ -103,6 +103,13 @@ top_co_hashtags <- rstats_tweets %>%
   count(word1, word2, sort = TRUE) %>% 
   filter(!is.na(word1) & !is.na(word2)) %>% 
   slice_max(n, n = 100, with_ties = FALSE)
+
+top_locations <- rstats_tweets %>%
+  filter(!is.na(location) & location != "#rstats") %>%
+  distinct(user_id, .keep_all = TRUE) %>%
+  mutate(location = str_replace_all(location, "London$", "London, England")) %>% 
+  count(location) %>%
+  slice_max(n, n = 10, with_ties = FALSE)
 ```
 
 
@@ -236,14 +243,31 @@ Row
 
 ```{r top_words}
 top_words %>%
-  knitr::kable(
-    format = "html",
-    escape = FALSE,
-    align = "cll",
-    col.names = c("Word", "Count"),
-    table.attr = 'class = "table"'
-  )
+  e_charts(word) %>%
+  e_bar(n, legend = FALSE) %>% 
+  e_x_axis(
+    axisLabel = list(
+      interval = 0L
+    )
+  ) %>% 
+  e_axis_labels(y = "Number of occurrences")
 ```
+
+### Top Locations
+
+```{r top_locations}
+top_locations %>% 
+  mutate(location = str_wrap(location, 9)) %>% 
+  e_charts(location) %>% 
+  e_bar(n, legend = FALSE) %>% 
+  e_x_axis(
+    axisLabel = list(
+      interval = 0L
+    )
+  ) %>% 
+  e_axis_labels(y = "Number of users from location")
+```
+
 
 Row
 -----------------------------------------------------------------------

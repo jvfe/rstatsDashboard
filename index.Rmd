@@ -247,9 +247,11 @@ top_words %>%
   e_bar(n, legend = FALSE) %>% 
   e_x_axis(
     axisLabel = list(
-      interval = 0L
+      interval = 0L,
+      rotate = 30
     )
-  ) %>% 
+  ) %>%
+  e_toolbox_feature("saveAsImage") %>%
   e_axis_labels(y = "Number of occurrences")
 ```
 
@@ -262,9 +264,11 @@ top_locations %>%
   e_bar(n, legend = FALSE) %>% 
   e_x_axis(
     axisLabel = list(
-      interval = 0L
+      interval = 0L,
+      rotate = 30
     )
-  ) %>% 
+  ) %>%
+  e_toolbox_feature("saveAsImage") %>%
   e_axis_labels(y = "Number of users from location")
 ```
 
